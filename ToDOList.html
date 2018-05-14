@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Todo App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.3.1/dist/semantic.min.css">
+    <script charset="utf-8" src="https://ucarecdn.com/libs/widget/3.3.0/uploadcare.full.min.js"></script>
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+
+    <div class="pusher">
+      <div class="ui inverted vertical masthead center aligned segment">
+
+        <div class="ui container">
+          <div class="ui large secondary inverted pointing menu">
+            <a class="ui inverted button" href="index.html">Inicio</a>
+            <a class="active item">Lista de tareas</a>
+            <div class="right item">
+                <li v-if="!autentificado">
+                    <a class="ui inverted button" @click="conectar" href="#">Iniciar sesión</a>
+                </li>
+<li v-if="autentificado">
+ <a class="ui inverted button">{{ usuarioActivo.displayName }}</a>
+ <a class="ui inverted button" @click="desconectar()" href="#">Cerrar sesión</a>
+
+</li>
+            </div>
+          </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="container">
+    <todo-list :tareas="tareas" :autentificado="autentificado" :usuario-activo="usuarioActivo"></todo-list>
+</div>
+
+
+<template id="todo-template">
+    <br></br>
+    <div class="ui center aligned grid">
+        <h2>Listado de tareas</h2>
+    </div>
+    <div class="ui container">
+        <br></br>
+        <!-- Formulario -->
+        <form @submit.prevent="agregarTarea(nuevaTarea)"
+              class="form">
+            <div class="ui fluid right action input">
+                <input v-model="nuevaTarea" required
+                       type="text" placeholder="Ingresar tarea" class="ui fluid right action input">
+						<button
+                            class="ui teal right labeled icon button" type="submit" :disabled="!autentificado"><i
+                            class="add square icon"></i> Añadir tarea
+                        </button>
+            </div>
+        </form>
+        <!-- Listado de tareas -->
+        <ul class="list-group">
+            <li v-for="tarea in tareas"
+                class="list-group-item clearfix">
+                <p class="lead" :class="{completado: tarea.completado}">
+                    <img class="avatar" :src="tarea.avatar">
+                    {{ tarea.titulo }}
+                    <small>({{ tarea.nombre }})</small>
+                </p>
+                <input v-model="tarea.titulo"
+                       v-show="editandoTarea === $index"
+                       @blur="editandoTarea = null, editarTarea(tarea)"
+                       type="text">
+                <div v-show="tarea.uid === usuarioActivo.uid">
+                    <div class="six wide column">
+                        <button @click="editandoTarea = $index"
+                                class="mini ui blue right floated button">
+                            <i class="edit icon"></i>
+                        </button>
+                        <button v-show="editandoTarea === $index"
+                                @click="editandoTarea = null, editarTarea(tarea)"
+                                class="mini ui green floated button">
+                                <i class="redo icon"></i>
+                        </button>
+                        <button @click="actualizarEstadoTarea(true, tarea)"
+                        class="mini ui green right floated button">
+                        <i class="check icon"></i>
+                        </button>
+                        <button @click="actualizarEstadoTarea(false, tarea)"
+                            class="mini ui teal right floated button">
+                        <i class="sync icon"></i>
+                        </button>
+                            <input type="file" class="upload icon" name="" >
+                        <button @click="eliminarTarea(tarea)"
+                                class="mini ui red right floated button">
+                            <i class="trash alternate outline icon"></i>
+                        </button>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+</template>
+<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/vue/1.0.24/vue.js"></script>
+<script src="https://apis.google.com/js/platform.js" async defer></script>
+<script src="https://www.gstatic.com/firebasejs/3.2.0/firebase.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
